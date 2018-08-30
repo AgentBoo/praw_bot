@@ -1,13 +1,9 @@
-'''
-	Module for creating a single reddit instance 
-'''
-
 from dotenv import load_dotenv, find_dotenv
 import praw 
 import os
 
-
 load_dotenv(find_dotenv())
+
 
 def get_reddit_instance(sub_name, user_agent):
 	reddit = praw.Reddit(client_id=os.getenv('CLIENT_ID'),
