@@ -35,7 +35,8 @@ def process_comment(comment):
 	'''
 		Check if a comment contains the right keywords. 
 		If it does, check if it is already in the db (multiple different keywords can be found in the same sentence) 
-		If not in the db, save it and reply to it 
+		If not in the db, reply and save (for low karma bots, reply first and get a rate limiting strike from reddit 
+		before saving the comment you may have not replied to) 
 	'''
 	for phrase in LOOKUP_PHRASE:
 		if re.search(phrase, comment.body, re.IGNORECASE):
@@ -44,14 +45,14 @@ def process_comment(comment):
 			result = db_cursor.execute("SELECT comment FROM posts WHERE comment=:comment and created_at=:created_at", query).fetchone() 
 	
 			if result is None:
+				# reply 
+				number_of_despacitos = len(db_cursor.execute("SELECT * FROM posts").fetchall()) + 1
+				comment.reply(get_scripted_reply(number_of_despacitos))
+				
 				# save 
 				db_cursor.execute("INSERT INTO posts VALUES (?,?,?)", (comment.submission.id, comment.body, comment.created_utc))
 				db.commit()
 
-				# reply 
-				number_of_despacitos = len(db_cursor.execute("SELECT * FROM posts").fetchall())
-				comment.reply(get_scripted_reply(number_of_despacitos))
-				
 				# print to console
 				print(comment.body)
 				print(get_scripted_reply(number_of_despacitos))
