@@ -1,0 +1,6 @@
+# misc
+
+__pycache__ 
+
+.env
+.sqlite3
